@@ -126,11 +126,11 @@ public class ConnectedClientThread extends Thread {
 					*/
 					if ( chaines[0].equals("demandeNom") ) { 
 						line = client.abonne.getPatronyme();
-						this.os.println(" Mon nom est : " + line);
+						this.os.println(line);
 						
 					} else if ( chaines[0].equals("setNom") ) { 
 						client.abonne.setPatronyme(chaines[1]);
-						this.os.println(" Mon nom est maintenant : " + chaines[1]);
+						this.os.println(chaines[1]);
 						
 						
 						
