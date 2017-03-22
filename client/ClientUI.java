@@ -7,8 +7,8 @@ import fr.ensta.fx.boatmonitoring.FXHomeUI;
 import fr.ensta.fx.boatmonitoring.user.BoatMonitorTab;
 import javafx.application.Platform;
 import javafx.scene.control.Tab;
+import javafx.stage.Stage;
 
-import Info.Client;
 
 
 public class ClientUI extends FXHomeUI implements Observer {
@@ -46,6 +46,7 @@ public class ClientUI extends FXHomeUI implements Observer {
 			   	if(rep.equals("OK"))
 			   	{
 			   		thread.getDataModel().setAccountName(accountName);
+			   		this.setAccountName(accountName);
 			   		
 		    		rep = client.myClient.stringTransmitOnly(password);
 		    		
@@ -55,7 +56,16 @@ public class ClientUI extends FXHomeUI implements Observer {
 			   			
 			  			final BoatMonitorTab boatMonitor = this.createAndAddMonitor();
 		                boatMonitor.setBoatName(thread.getDataModel().getBoatName());
+		                this.setAccountName(client.myClient.stringTransmitOnly("demandeNom"));
 		                thread.getDataModel().addObserver(this);
+		                
+		                this.addLogList(client.myClient.stringTransmitOnly("demandeAdresse"));
+		                this.addLogList(client.myClient.stringTransmitOnly("demandeTel"));
+		                this.addLogList(client.myClient.stringTransmitOnly("demandeEmail"));
+		                this.addLogList(client.myClient.stringTransmitOnly("demandeDate"));
+		                this.addLogList(client.myClient.stringTransmitOnly("demandeAmis"));
+		                
+		                
 		            }
 			    	else
 			   		{
@@ -82,6 +92,15 @@ public class ClientUI extends FXHomeUI implements Observer {
         this.removeAllMonitors();
         this.setLoginStatus(false);
         this.setAccountName(null);
+        try
+        {
+        	this.client.myClient.disconnectFromServer();
+        	this.cleanLogList();
+        }
+        catch (Exception e)
+    	{
+			e.printStackTrace();
+		}
     }
     
     @Override
@@ -90,13 +109,33 @@ public class ClientUI extends FXHomeUI implements Observer {
 				if (aTab instanceof BoatMonitorTab )  
 					Platform.runLater(
 							() -> {
-								((BoatMonitorTab) aTab).setBoatName( ((Client) observable).getBoatName() );
+								((BoatMonitorTab) aTab).setBoatName("Test");
 							}
 					);
 			}
     }
     
-    public static void main( String[] args ) {
+    
+    
+    @Override
+	public void start(Stage primaryStage) throws Exception {
+		primaryStage.setOnCloseRequest(event -> {cleanClose();});
+		super.start(primaryStage);
+	}
+    
+    public void cleanClose()
+    {
+    	try
+    	{
+    		client.myClient.disconnectFromServer();
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+
+	public static void main( String[] args ) {
     	
     	launch(args);
     	
